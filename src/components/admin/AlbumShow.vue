@@ -1,0 +1,63 @@
+<template lang="html">
+  <div class="photos">
+    <router-link :to="'/admin/client/' + client_id + '/events/' + event_id + '/albums'" class="btn btn-light bg-white">
+      voltar
+    </router-link>
+    <div class="mt-3">
+      <div class="row">
+        <div class="col-lg-3 mb-4 text-center" v-for="photo in photos">
+          <img :src="photo.image_url" class="img-thumbnail mr-2" />
+          {{ photo.name }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      photos: [],
+      album_id: this.$route.params.album_id,
+      client_id: this.$route.params.client_id,
+      event_id: this.$route.params.event_id
+    };
+  },
+  mounted() {
+    this.getAlbums();
+  },
+  methods: {
+    getAlbums() {
+      this.$http
+        .get("https://brezan.herokuapp.com/photos", {
+          params: {
+            album_id: this.album_id
+          }
+        })
+        .then(response => {
+          this.photos = response.body;
+        });
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.photos {
+  a {
+    text-decoration: none;
+    text-transform: none;
+    color: grey;
+  }
+  .link {
+    width: 260px;
+    height: 17vh;
+    background-color: #f5f5f5;
+    line-height: 16vh;
+    font-size: 20px;
+    font-weight: bold;
+    color: #999999;
+  }
+}
+</style>
