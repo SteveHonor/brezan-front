@@ -34,9 +34,9 @@
                     <td>{{ client.email }}</td>
                     <td>{{ client.phone || '-' }}</td>
                     <td>
-                      <button type="button" class="btn btn-light" @click="copy(client.token)">
-                        <i class="far fa-copy"></i>
-                      </button>
+                      <a class="btn btn-light" target="_blank" :href="link(client.token)">
+                        <i class="fa fa-link"></i>
+                      </a>
                     </td>
                     <td class="text-right">
                       <router-link
@@ -149,8 +149,8 @@ export default {
 
   },
   methods: {
-    copy(token) {
-      navigator.clipboard.writeText('http://' + window.location.hostname + '/' + token + '/photos')
+    link(token) {
+      return 'http://' + window.location.hostname + '/' + token + '/photos'
     },
     getClients() {
       this.$http.secured.get("/clients").then(response => {

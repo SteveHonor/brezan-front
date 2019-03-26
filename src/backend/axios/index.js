@@ -16,7 +16,7 @@ if (!store.getters.user.email) {
 
 const securedAxiosInstance = axios.create({
   baseURL: API_SECURE,
-  withCredentials: false,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin' : '*',
