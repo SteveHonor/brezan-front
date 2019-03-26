@@ -4,12 +4,15 @@
       voltar
     </router-link>
     <div class="mt-3">
-      <div class="row">
-        <div class="col-lg-3 mb-4 text-center" v-for="photo in photos">
-          <img :src="photo.image_url" class="img-thumbnail mr-2" />
-          {{ photo.name }}
+
+        <!-- <div class="col-lg-3 mb-4 text-center" v-for="photo in photos">
+        </div> -->
+
+        <div v-masonry transition-duration="0.3s" item-selector=".item">
+            <div v-masonry-tile class="item" v-for="(item, index) in photos">
+              <img :src="item.image_url" class="img-thumbnail mr-2" />
+            </div>
         </div>
-      </div>
     </div>
   </div>
 </template>
@@ -25,18 +28,18 @@ export default {
     };
   },
   mounted() {
+    this.$store.dispatch('setTitle', 'Fotos')
     this.getAlbums();
   },
   methods: {
     getAlbums() {
-      this.$http
-        .get("https://brezan.herokuapp.com/photos", {
+      this.$http.secured.get("/photos", {
           params: {
             album_id: this.album_id
           }
         })
         .then(response => {
-          this.photos = response.body;
+          this.photos = response.data;
         });
     }
   }

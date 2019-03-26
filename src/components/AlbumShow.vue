@@ -10,10 +10,15 @@
         <img src="@/assets/ballon.png" class="ballon" />
       </div>
     </div>
-    <div class="row justify-content-md-center">
-      <div class="mt-3">
+    <div class="row justify-content-md-center mt-5">
+      <div class="col-md-11 col-12">
+
         <viewer :images="photos">
-          <img v-for="photo in photos" :src="photo.image_url" :key="photo.image_url" class="img-thumbnail mr-2">
+          <div v-masonry transition-duration="0.3s" item-selector=".item">
+            <div v-masonry-tile class="item" v-for="(item, index) in photos">
+              <img :src="item.image_url" :key="item .image_url" class="img-thumbnail mr-2">
+            </div>
+          </div>
         </viewer>
       </div>
     </div>
@@ -40,12 +45,12 @@ export default {
   },
   methods: {
     getAlbums () {
-      this.$http.get('https://brezan.herokuapp.com/photos', {
+      this.$http.secured.get('/photos', {
         params: {
           album_id: this.album_id
         }
       }).then(response => {
-        this.photos = response.body
+        this.photos = response.data
       })
     }
   }
@@ -79,6 +84,14 @@ export default {
     width: 15rem;
     margin-bottom: 30px;
     position: relative;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .photos {
+    .img-thumbnail {
+      width: 100% !important;
+    }
   }
 }
 </style>

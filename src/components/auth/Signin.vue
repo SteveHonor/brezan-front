@@ -7,8 +7,7 @@
 
         </div>
       <h3 class="text-secondary mt-5">Bem vindo</h3>
-       <!--Continually expanded and constantly improved Inspinia Admin Them (IN+)-->
-      </p>
+
       <p class="text-white">Faça o login.</p>
       <form class="m-t" @submit.prevent="signin()">
         <div class="alert alert-danger" v-if="error">{{ error }}</div>
@@ -37,32 +36,27 @@ export default {
     }
   },
   mounted () {
-    if (localStorage.getItem('logged')) {
-      this.$router.replace('/photos')
+    this.$store.dispatch('unsetClient')
+
+    if (this.$store.getters.signedIn) {
+      this.$router.replace('/admin/clients')
     }
   },
   methods: {
     signin () {
-      if (this.email === 'admin@brezan.com.br' && this.password === '123123') {
-        localStorage.setItem('logged', true)
-        this.$router.replace('/admin/clients')
-        return
-      }
-
-      const API_URL = 'https://brezan.herokuapp.com/'
-
-      this.$http.post(API_URL + '/signin', {
+      this.$http.plain.post('/signin', {
         email: this.email,
         password: this.password
       }).then(response => this.signinSuccessful(response))
         .catch(error => this.signinFailed(error))
     },
     signinSuccessful (response) {
-      localStorage.setItem('logged', true)
-      localStorage.setItem('user', JSON.stringify(response.body))
-      this.error = ''
-      console.log('testes');
-      this.$router.replace('/photos')
+      this.$store.dispatch('login')
+      this.$store.dispatch('csrf', response.data.csrf)
+      this.$store.dispatch('user', response.data.user)
+      console.log('teste');
+
+      this.$router.replace('/admin/clients')
     },
     signinFailed (error) {
       this.error = (error.response && error.response.data && error.response.data.error) || ''

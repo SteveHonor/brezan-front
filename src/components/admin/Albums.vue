@@ -16,24 +16,33 @@
     <div class="mt-3">
       <div class="row">
         <div class="col-lg-3 mb-4 text-center" v-for="album in albums">
-          <span class="album-title">{{ album.name }}</span>
-          <router-link
-            :to="
-              '/admin/client/' +
-                client_id +
-                '/events/' +
-                event_id +
-                '/albums/' +
-                album.id
-            "
-          >
-            <img :src="album.image_url" class="img-thumbnail mr-2" />
-          </router-link>
-        </div>
+          <div class="card">
 
+            <div class="card-body">
+
+              <router-link
+              :to="
+              '/admin/client/' +
+              client_id +
+              '/events/' +
+              event_id +
+              '/albums/' +
+              album.id
+              "
+              >
+              <img :src="album.image_url" class="img-thumbnail mr-2" />
+            </router-link>
+            <span class="album-title float-left">{{ album.name }}</span>
+            <button type="button" class="btn btn-sm btn-light float-right" @click="deleteAlbum(album.id)">
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -46,20 +55,29 @@ export default {
     };
   },
   mounted() {
+    this.$store.dispatch('setTitle', 'Albums')
     this.getAlbums();
   },
   methods: {
     getAlbums() {
-      this.$http
-        .get("https://brezan.herokuapp.com/albums", {
-          params: {
-            event_id: this.event_id
-          }
-        })
-        .then(response => {
-          this.albums = response.body;
-        });
-    }
+      this.$http.secured.get("/albums", {
+        params: {
+          event_id: this.event_id
+        }
+      })
+      .then(response => {
+        this.albums = response.data;
+
+        if (this.albums.length == 0) {
+          this.$router.replace('/admin/client/' + this.client_id + '/events/' + this.event_id + '/albums/new')
+        }
+      });
+    },
+    deleteAlbum(id) {
+      this.$http.secured.delete("/albums/" + id).then(response => {
+        this.getAlbums();
+      });
+    },
   }
 };
 </script>
@@ -72,7 +90,6 @@ export default {
   }
   .album-title {
     color: #424242;
-    position: absolute;
     left: 16px;
     right: 16px;
     bottom: 5px;

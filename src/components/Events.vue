@@ -1,36 +1,36 @@
 <template lang="html">
   <div class="events">
     <div class="row mt-3">
-      <div class="col-md-3 text-right">
+      <div class="col-md-3 text-right d-none d-md-block">
         <img src="@/assets/photographer1.png" alt="">
       </div>
-      <div class="col-md-6">
+      <div class="col-md-6 col-12">
         <div class="card">
           <h5 class="card-header">Eventos</h5>
           <div class="card-body">
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>Nome do evento</th>
-                <th>Data do evento</th>
+                <th><span class="d-none d-md-block">Nome do evento</span></th>
+                <th><span class="d-none d-md-block">Data do evento</span></th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="event in events">
+              <tr v-for="event in events" :key="event.id">
                 <td>{{ event.name }}</td>
                 <td>{{ event.data | date('%d/%m/%Y') }}</td>
                 <td class="text-right">
                   <router-link
                     :to="
                       '/client/' +
-                        client.user.id +
+                        event.client_id +
                         '/events/' +
                         event.id +
                         '/albums'
                     "
                     class="btn btn-info"
-                    >Albums</router-link
+                    >Fotos</router-link
                   >
                 </td>
               </tr>
@@ -38,9 +38,9 @@
           </table>
         </div>
         </div>
-        <img src="@/assets/header-box.jpg" alt="fotografo" class="photographer" width="100%"/>
+        <img src="@/assets/header-box.jpg" alt="fotografo" class="photographer d-none d-md-block" width="100%"/>
       </div>
-      <div class="col-md-3 pt-5">
+      <div class="col-md-3 pt-5 d-none d-md-block">
         <img src="@/assets/photographer2.png" alt="">
       </div>
     </div>
@@ -107,25 +107,26 @@ export default {
   data() {
     return {
       events: [],
-      client: JSON.parse(localStorage.getItem("user")),
+      client: {},
       name: "",
       data: ""
     };
   },
   mounted() {
+    if (this.$route.params.token) {
+      this.$store.dispatch('setClient', this.$route.params.token)
+    }
     this.getClients();
   },
   methods: {
     getClients() {
-      this.$http
-        .get("https://brezan.herokuapp.com/events", {
-          params: {
-            email: this.client.user.email
-          }
-        })
-        .then(response => {
-          this.events = response.body;
-        });
+      this.$http.secured.get("/events", {
+        params: {
+          token: this.$route.params.token
+        }
+      }).then(response => {
+        this.events = response.data;
+      });
     }
   }
 };

@@ -4,14 +4,14 @@ import jQuery from'jquery'
   $.fn.uploader = function(options) {
     return this.each(function(index) {
       options = $.extend({
-        submitButtonCopy: 'Enviar Arquivos selecionados',
-        instructionsCopy: 'Arraste e solte, ou',
-        furtherInstructionsCopy: 'Your can also drop more files, or',
-        selectButtonCopy: 'Selecione as imagens',
-        secondarySelectButtonCopy: 'Select More Files',
+        submitButtonCopy: 'Enviar Fotos selecionados',
+        furtherInstructionsCopy: 'Você também pode',
+        selectButtonCopy: 'Selecione as Fotos',
+        secondarySelectButtonCopy: 'Selecione mais fotos',
         dropZone: $(this),
         fileTypeWhiteList: ['jpg', 'png', 'jpeg', 'gif', 'pdf'],
-        badFileTypeMessage: 'Sorry, we\'re unable to accept this type of file.',
+        badFileTypeMessage: 'Desculpe, não podemos aceitar este tipo de foto.',
+        // ajaxUrl: 'http://localhost:3000/albums',
         ajaxUrl: 'https://brezan.herokuapp.com/albums',
         testMode: false
       }, options);
@@ -26,18 +26,36 @@ import jQuery from'jquery'
       // create DOM elements
       var dom = {
         uploaderBox: $(this),
-        submitButton: $('<button class="js-uploader__submit-button uploader__submit-button uploader__hide">' +
-          options.submitButtonCopy + '</button>'),
-        instructions: $('<p class="js-uploader__instructions uploader__instructions">' +
-          options.instructionsCopy + '</p>'),
-        selectButton: $('<input style="height: 0; width: 0;" id="fileinput' + index + '" type="file" multiple class="js-uploader__file-input uploader__file-input">' +
-          '<label for="fileinput' + index + '" style="cursor: pointer;" class="js-uploader__file-label uploader__file-label">' +
-          options.selectButtonCopy + '</label>'),
+        submitButton: $(
+          '<div class="row mt-4">'+
+          '<div class="col-md-12">'+
+          '<div class="card">'+
+          '<div class="card-header">'+
+          '<span class="font-weight-bolder mr-4 h4">4º</span> Salvar Album'+
+          '</div>'+
+          '<div class="card-body">'+
+          '<button class="js-uploader__submit-button uploader__submit-button uploader__hide btn btn-success" id="submitButton" disabled="true">' +
+          options.submitButtonCopy + '</button></div></div></div></div>'),
+
+
+        selectButton: $(
+          '<div class="row mt-4">'+
+          '<div class="col-md-12">'+
+          '<div class="card">'+
+          '<div class="card-header">'+
+          '<span class="font-weight-bolder mr-4 h4">5º</span> Selecionar fotos do album'+
+          '</div>'+
+          '<div class="card-body">'+
+          '<input style="height: 0; width: 0;" id="fileinput' + index + '" type="file" multiple class="js-uploader__file-input uploader__file-input">' +
+          '<label for="fileinput' + index + '" style="cursor: pointer;" class="js-uploader__file-label uploader__file-label btn btn-info">' +
+          options.selectButtonCopy + '</label></div></div></div></div>'),
+
         secondarySelectButton: $('<input style="height: 0; width: 0;" id="secondaryfileinput' + index + '" type="file"' +
-          ' multiple class="js-uploader__file-input uploader__file-input">' +
-          '<label for="secondaryfileinput' + index + '" style="cursor: pointer;" class="js-uploader__file-label uploader__file-label uploader__file-label--secondary">' +
+          ' multiple class="small mt-5 js-uploader__file-input uploader__file-input"> ' +
+          '<label for="secondaryfileinput' + index + '" style="cursor: pointer;" class="js-uploader__file-label uploader__file-label uploader__file-label--secondary btn btn-sm btn-secondary">' +
           options.secondarySelectButtonCopy + '</label>'),
-        fileList: $('<ul class="js-uploader__file-list uploader__file-list"></ul>'),
+
+        fileList: $('<ul class="list-unstyled  align-middle js-uploader__file-list uploader__file-list"></ul>'),
         contentsContainer: $('<div class="js-uploader__contents uploader__contents"></div>'),
         furtherInstructions: $('<p class="js-uploader__further-instructions uploader__further-instructions uploader__hide">' + options.furtherInstructionsCopy + '</p>')
       };
@@ -53,13 +71,12 @@ import jQuery from'jquery'
 
       function setupDOM(dom) {
         dom.contentsContainer
-          .append(dom.instructions)
           .append(dom.selectButton);
         dom.furtherInstructions
           .append(dom.secondarySelectButton);
         dom.uploaderBox
-          .append(dom.fileList)
           .append(dom.contentsContainer)
+          .append(dom.fileList)
           .append(dom.submitButton)
           .after(dom.furtherInstructions);
       }
@@ -75,6 +92,7 @@ import jQuery from'jquery'
         // hack for being able selecting the same file name twice
         dom.selectButton.on('click', function() {
           this.value = null;
+          document.getElementById('submitButton').disabled = false;
         });
         dom.selectButton.on('change', selectFilesHandler);
         dom.secondarySelectButton.on('click', function() {
@@ -83,6 +101,10 @@ import jQuery from'jquery'
         dom.secondarySelectButton.on('change', selectFilesHandler);
 
         // handle the submit click
+        dom.submitButton.on('click', function () {
+          $.blockUI({ message: '<h1 class="mb-4"><i class="fa fa-exclamation"></i></h1><h2>aguarde um momento...</h2><h5 class="text-warning ">dependendo da quandidade de fotos, esse processo pode demorar um pouco...</h5>' });
+        });
+
         dom.submitButton.on('click', uploadSubmitHandler);
 
         // remove link handler
@@ -110,14 +132,14 @@ import jQuery from'jquery'
         var fileSize = file.size;
         var id = state.listIndex;
         var sizeWrapper;
-        var fileNameWrapper = $('<span class="uploader__file-list__text">' + fileName + '</span>');
+        // var fileNameWrapper = $('<span class="uploader__file-list__text">' + fileName + '</span>');
 
         state.listIndex++;
 
         var listItem = $('<li class="uploader__file-list__item" data-index="' + id + '"></li>');
         var thumbnailContainer = $('<span class="uploader__file-list__thumbnail"></span>');
-        var thumbnail = $('<img class="thumbnail"><i class="fa fa-spinner fa-spin uploader__icon--spinner"></i>');
-        var removeLink = $('<span class="uploader__file-list__button"><button class="uploader__icon-button js-upload-remove-button fa fa-times" data-index="' + id + '"></button></span>');
+        var thumbnail = $('<img class="col-md-2 img-thumbnail"><i class="fa fa-spinner fa-spin uploader__icon--spinner"></i>');
+        var removeLink = $('<span class="uploader__file-list__button"><button class="uploader__icon-button js-upload-remove-button fa fa-trash float-right btn btn-outline-danger" data-index="' + id + '"></button></span>');
 
         // validate the file
         if (options.fileTypeWhiteList.indexOf(getExtension(file.name).toLowerCase()) !== -1) {
@@ -128,10 +150,10 @@ import jQuery from'jquery'
             fileName: fileName,
             fileSize: fileSize
           });
-          sizeWrapper = $('<span class="uploader__file-list__size">' + formatBytes(fileSize) + '</span>');
+          sizeWrapper = $('<span class="uploader__file-list__size ml-4 font-weight-bold">' + formatBytes(fileSize) + '</span>');
         } else {
           // file is not ok, only add it to the dom
-          sizeWrapper = $('<span class="uploader__file-list__size"><span class="uploader__error">' + options.badFileTypeMessage + '</span></span>');
+          sizeWrapper = $('<span class="uploader__file-list__size"><span class="uploader__error">' + options.badFileTypeMessage + '</span></span> hr  ');
         }
 
         // create the thumbnail, if you can
@@ -153,9 +175,10 @@ import jQuery from'jquery'
         listItem.append(thumbnailContainer);
 
         listItem
-          .append(fileNameWrapper)
+          // .append(fileNameWrapper)
           .append(sizeWrapper)
-          .append(removeLink);
+          .append(removeLink)
+          .append('<hr>');
 
         dom.fileList.append(listItem);
       }

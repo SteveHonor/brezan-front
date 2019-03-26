@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="albums container">
-    <router-link :to="'/client/' + client_id + '/events'" class="btn btn-light bg-white">
+    <router-link :to="'/' +token + '/photos'" class="btn btn-light bg-white">
       voltar
     </router-link>
 
@@ -28,7 +28,8 @@ export default {
     return {
       albums: [],
       client_id: this.$route.params.client_id,
-      event_id: this.$route.params.event_id
+      event_id: this.$route.params.event_id,
+      token: this.$store.getters.token
     }
   },
   mounted () {
@@ -36,12 +37,12 @@ export default {
   },
   methods: {
     getAlbums () {
-      this.$http.get('https://brezan.herokuapp.com/albums', {
+      this.$http.secured.get('/albums', {
         params: {
           event_id: this.event_id
         }
       }).then(response => {
-        this.albums = response.body
+        this.albums = response.data
       })
     }
   }

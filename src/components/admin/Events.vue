@@ -35,7 +35,7 @@
               <tbody>
                 <tr v-for="event in events">
                   <td valign="middle">{{ event.name }}</td>
-                  <td>{{ event.data }}</td>
+                  <td>{{ event.data | date("%d/%m/%Y") }}</td>
                   <td class="text-right">
                     <router-link
                     :to="
@@ -45,9 +45,12 @@
                     event.id +
                     '/albums'
                     "
-                    class="btn btn-info"
+                    class="btn btn-sm btn-info"
                     >Albums</router-link
                     >
+                    <button type="button" class="btn btn-sm btn-outline-danger ml-3" @click="deleteEvent(event.id)">
+                      <i class="fa fa-trash"></i>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -88,7 +91,7 @@
       </div>
 
       <div class="form-group">
-        <label for="">Data</label>
+        <label for="">Data do Evento</label>
         <input type="date" class="form-control" v-model="data" required />
       </div>
     </div>
@@ -111,6 +114,8 @@
 </template>
 
 <script>
+import $ from 'jquery'
+
 export default {
   data() {
     return {
@@ -121,23 +126,31 @@ export default {
     };
   },
   mounted() {
+    this.$store.dispatch('setTitle', 'Eventos')
     this.getClients();
   },
   methods: {
     getClients() {
-      this.$http
-      .get("https://brezan.herokuapp.com/events", {
+      this.$http.secured.get("/events", {
         params: {
           client_id: this.client_id
         }
       })
       .then(response => {
-        this.events = response.body;
+        this.events = response.data;
+
+        if (this.events.length == 0) {
+          $('#modalEvent').modal()
+        }
+      });
+    },
+    deleteEvent(id) {
+      this.$http.secured.delete("/events/" + id).then(response => {
+        this.getClients();
       });
     },
     send() {
-      this.$http
-      .post("https://brezan.herokuapp.com/events", {
+      this.$http.secured.post("/events", {
         event: {
           name: this.name,
           data: this.data,

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div v-if="signin() == 'true' && isAdmin() == 'true'" class="container-fluid">
+    <div v-if="signin() == true && isAdmin() == true && client() == false" class="container-fluid">
       <div class="row">
         <nav class="col-md-2 d-none d-md-block sidebar">
           <div class="topbar-left">
@@ -12,24 +12,20 @@
             <div class="sidebar-sticky">
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a class="nav-link active" href="#">
+                  <router-link class="nav-link active" to="'/clients'">
                     <i class="fa fa-user"></i> Clientes
-                  </a>
+                  </router-link>
                 </li>
+
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
-                    <i class="fa fa-key"></i> Acessos
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">
+                  <a class="nav-link" href="http://www.crescer.fot.br/index.html">
                     <i class="fa fa-cookie-bite"></i> Site
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">
+                  <button class="btn nav-link btn-link" @click="signOut()">
                     <i class="fa fa-power-off"></i> sair
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -47,7 +43,7 @@
 
                 <ul class="list-inline menu-left mb-0">
                   <li class="hide-phone list-inline-item app-search">
-                    <h3 class="page-title">{{ title }}</h3>
+                    <h3 class="page-title">{{ title() }}</h3>
                   </li>
                 </ul>
 
@@ -60,13 +56,15 @@
         </div>
       </div>
     </div>
-    <div v-else-if="signin() == 'true' && isAdmin() == 'false'" class="container-fluid">
+
+    <div v-else-if="(signin() == true && isAdmin() == false) || client() == true" class="container-fluid">
       <div class="text-center p-5">
         <img src="./assets/logo.png" height="42" alt="logo" />
       </div>
       <router-view />
     </div>
-    <div class="container" v-else>
+
+    <div class="container" v-else-if="signin() == false">
       <div class="row justify-content-md-center">
         <div class="col-lg-5">
           <router-view />
@@ -81,22 +79,22 @@ import "../node_modules/bootstrap/dist/js/bootstrap.js";
 
 export default {
   name: "App",
-  data() {
-    return {
-      title: localStorage.getItem("title")
-    };
-  },
-  watch() {
-    if (!this.signin()) {
-      this.$router.replace("/signin");
-    }
-  },
   methods: {
+    signOut () {
+      this.$store.dispatch('logout')
+      this.$router.replace('/signin')
+    },
     signin () {
-      return localStorage.getItem("logged");
+      return this.$store.getters.signedIn
     },
     isAdmin () {
-      return 'false'
+      return this.$store.getters.isAdmin
+    },
+    client () {
+      return this.$store.getters.isClient
+    },
+    title () {
+      return this.$store.getters.title
     }
   }
 };
@@ -107,10 +105,6 @@ export default {
 @import "../node_modules/bootstrap/dist/css/bootstrap.css";
 @import "../node_modules/@fortawesome/fontawesome-free/css/all.css";
 @import "./assets/css/style.scss";
-
-* {
-  border-radius: 2px !important;
-}
 
 html {
   overflow-x: hidden;

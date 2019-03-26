@@ -23,6 +23,8 @@
                   <tr>
                     <th>Nome</th>
                     <th>E-mail</th>
+                    <th>Celular</th>
+                    <th>Link</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -30,6 +32,12 @@
                   <tr v-for="client in clients">
                     <td class="text-uppercase">{{ client.name }}</td>
                     <td>{{ client.email }}</td>
+                    <td>{{ client.phone || '-' }}</td>
+                    <td>
+                      <button type="button" class="btn btn-light" @click="copy(client.token)">
+                        <i class="far fa-copy"></i>
+                      </button>
+                    </td>
                     <td class="text-right">
                       <router-link
                         :to="'/admin/client/' + client.id + '/events'"
@@ -38,7 +46,7 @@
                         Eventos
                       </router-link>
 
-                      <button type="button" class="btn btn-sm btn-outline-danger ml-3">
+                      <button type="button" class="btn btn-sm btn-outline-danger ml-3" @click="deleteUser(client.id)">
                         <i class="fa fa-trash"></i>
                       </button>
                     </td>
@@ -91,14 +99,15 @@
             </div>
 
             <div class="form-group">
-              <label for="">Senha</label>
+              <label for="">Celular</label>
               <input
-                type="text"
+                type="tel"
                 class="form-control"
-                v-model="password"
+                v-model="phone"
                 required
               />
             </div>
+
           </div>
           <div class="modal-footer">
             <button
@@ -110,7 +119,7 @@
             </button>
             <button
               type="button"
-              class="button button--big-bottom"
+              class="btn btn-primary"
               @click="send()"
             >
               Adicionar Cliente
@@ -123,33 +132,43 @@
 </template>
 
 <script>
+import $ from 'jquery'
+
 export default {
   data() {
     return {
       clients: [],
       name: "",
       email: "",
-      password: ""
+      phone: ''
     };
   },
   mounted() {
-    localStorage.setItem("title", "Clientes");
+    this.$store.dispatch('setTitle', 'Clientes')
     this.getClients();
+
   },
   methods: {
+    copy(token) {
+      navigator.clipboard.writeText('http://' + window.location.hostname + '/' + token + '/photos')
+    },
     getClients() {
-      this.$http.get("https://brezan.herokuapp.com/clients").then(response => {
-        this.clients = response.body;
+      this.$http.secured.get("/clients").then(response => {
+        this.clients = response.data;
+      });
+    },
+    deleteUser(id){
+      this.$http.secured.delete("/clients/" + id).then(response => {
+        this.getClients();
       });
     },
     send() {
-      this.$http
-        .post("https://brezan.herokuapp.com/clients", {
+      this.$http.secured
+        .post("/clients", {
           client: {
             name: this.name,
             email: this.email,
-            password: this.password,
-            password_confirmation: this.password
+            phone: this.phone
           }
         })
         .then(response => {

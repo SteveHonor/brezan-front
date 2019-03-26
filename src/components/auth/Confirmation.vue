@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     send () {
-      const API_URL = 'https://brezan.herokuapp.com/'
+      const API_URL = '/'
 
       this.$http.plain.put(API_URL + '/confirmation', {
         password: this.password,

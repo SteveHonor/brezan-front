@@ -12,6 +12,7 @@ import ClientAlbumShow from '@/components/AlbumShow'
 import PhotosEvent from '@/components/Events'
 
 import Signin from '@/components/auth/Signin'
+import store from './store'
 
 Vue.use(Router)
 
@@ -43,11 +44,8 @@ var router = new Router({
       component: Signin
     },
     {
-      path: '/photos',
+      path: '/:token/photos',
       component: PhotosEvent,
-      meta: {
-        requiresAuth: true
-      }
     },
     {
       path: '/client/:client_id/events/:event_id/albums',
@@ -93,10 +91,9 @@ var router = new Router({
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  console.log(requiresAuth, localStorage.getItem('logged'));
-  if (requiresAuth && !localStorage.getItem('logged')) {
+  if (requiresAuth && !store.getters.signedIn) {
     next('/signin')
-  } else if (requiresAuth && localStorage.getItem('logged')) {
+  } else if (requiresAuth && store.getters.signedIn) {
     next()
   } else {
     next()

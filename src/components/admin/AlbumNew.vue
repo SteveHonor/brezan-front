@@ -2,7 +2,7 @@
   <section role="main" class="l-main">
     <div class="row">
       <div class="col-md-12">
-        <router-link :to="'/admin/client/' + client_id + '/events/' + event_id + '/albums'" class="btn btn-light bg-white">
+        <router-link :to="'/admin/client/' + client_id + '/events/'" class="btn btn-light bg-white">
           voltar
         </router-link>
       </div>
@@ -10,44 +10,49 @@
     <div class="row mt-4">
       <div class="col-lg-12">
         <div class="card">
+          <div class="card-header">
+            <span class="font-weight-bolder mr-4 h4">1º</span> Título do Album
+          </div>
           <div class="card-body">
-
             <div class="form-group">
               <label for="">Título do Álbum</label>
-              <input type="text" class="form-control title" required>
-            </div>
-
-            <h6></h6>
-            <span class="button button--big-bottom btn-file">
-              Foto de capa do Album <input type="file" id="imgInp">
-            </span>
-            <img id='img-upload' class="img-thumbnail mb-4"/>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-lg-12">
-
-            <h4>Fotos do Album</h4>
-            <div class="uploader__box js-uploader__box">
-
-              <div class="uploader__contents">
-                <label class="button button--secondary" for="fileinput">Select Files</label>
-                <input id="fileinput" class="uploader__file-input" type="file" multiple value="Select Files">
-              </div>
-              <input class="button button--big-bottom" type="submit" value="Upload Selected Files">
-
+              <input type="text" class="form-control title" required v-model="name">
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="row mt-4">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <span class="font-weight-bolder mr-4 h4">2º</span> Foto de Capa
+          </div>
+          <div class="card-body">
+            <span class="btn btn-warning btn-file">
+              Foto de capa do Album <input type="file" id="imgInp">
+            </span>
+            <div class="row mt-4">
+              <div class="col-md-12">
+                <img id='img-upload' width="300" />
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="uploader__box js-uploader__box"></div>
+
     <input type="hidden" id="event" :value="event_id">
   </section>
 </template>
 
 <script>
-
+import $ from 'jquery'
+import 'block-ui'
 require('@/assets/js/imageuploader.js')
 
 export default {
@@ -55,7 +60,8 @@ export default {
     return {
       files: [],
       name: '',
-      event_id: this.$route.params.event_id
+      event_id: this.$route.params.event_id,
+      client_id: this.$route.params.client_id,
     }
   },
   mounted () {
@@ -104,6 +110,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.thumbnail  {
+  width: 445px;
+  display: list-item;
+  margin-top: 30px;
+}
 .btn-file {
   position: relative;
   overflow: hidden;

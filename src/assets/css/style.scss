@@ -1,3 +1,4 @@
+
 body {
   background: #fafafa;
   font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -52,6 +53,26 @@ h5 small {
 
 * {
   outline: none !important;
+}
+
+.blockUI {
+  z-index: 1011;
+  position: fixed;
+  padding: 0px;
+  margin: 0px;
+  width: 30%;
+  top: 40%;
+  left: 35%;
+  text-align: center;
+  border: 0px !important;
+  color: rgb(255, 255, 255) !important;
+  background-color: transparent !important;
+  cursor: wait;
+}
+
+.blockOverlay {
+  background-color: rgb(0, 0, 0) !important;
+  opacity: 0.8 !important;
 }
 
 a {
@@ -998,6 +1019,12 @@ b {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
+.thumbnail  {
+  width: 445px;
+  display: list-item;
+  margin-top: 30px;
+}
+
 .thumb-sm {
   height: 32px;
   width: 32px;
@@ -1318,8 +1345,8 @@ b {
 }
 
 .btn-primary {
-  background-color: #67a8e4;
-  border: 1px solid #67a8e4;
+  background: #45aed6;
+  border-color: #2a95be;
 }
 
 .btn-outline-primary {
